@@ -26,7 +26,7 @@ $ brew tap homebrew/services
 
 Now we can start the postgres service with the following command,
 
-``
+```
 $ brew services start postgresql
 # ==> Successfully started `postgresql` (label: homebrew.mxcl.postgresql)
 ```

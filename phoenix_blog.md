@@ -3,7 +3,7 @@
 ## Setting up the Environment
 The first thing I do when beginning to develop with a new language is check to
 see if the have a version manager. Like Ruby, Python, and  Node.js, Elixir is no
-different, [kiex](https://github.com/taylor/kiex) is a stripped down version manager. 
+different, [kiex](https://github.com/taylor/kiex) is a stripped down version manager.
 
 To install, run
 
@@ -145,18 +145,63 @@ Initialize the repository,
 $ git init
 ```
 
+Next let's commit our code, it's fine to commit everything. 
+*You can take a look at the default .gitignore file for reference. For now we
+will be ignoring the phoenix secret file, but eventually we will use environment
+variables.*
+
+```
+$ git commit -am 'Initial phoenix project.'
+```
+
 Now we will go to [GitHub.com](https://github.com) and create a repository where
 our code will live. Then follow the instructions on github once the repository
 is created.
 
 ```
-
+$ git remote add origin git@github.com:natemacinnes/repository_name.git
+$ git push -u origin master
 ```
+
+Now we can continue our set up and make commits and push our changes along the
+way.
 
 ## Configuring the DB
 
-Now that you have your PostreSQL database setup. 
+Now that you have your PostreSQL database setup.
 (you can make sure the service is running if you are using *brew services* with
 `brew services list | grep postgresql`)
 
+With postgres running we can update the `config/dev.exs` file.
 
+Here is an example of the one used for my project, in dev,
+
+```
+# config/dev.exs
+#...
+# Configure your database
+config :pxblog, Pxblog.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  username: "postgres",
+  password: "postgres",
+  database: "pxblog_dev",
+  hostname: "localhost",
+  pool_size: 10
+```
+If you want to just use the default config file for development. Create a postgres user calls 'postgres' and password 'postgres'.
+
+```
+$ createuser -d --pwprompt postgres
+```
+
+Create the database and tables for phoenix using the following command.
+
+```
+$ mix ecto.create
+```
+
+Now when you start the server you should no longer see any database errors.
+
+This is enough to get started. 
+
+Now we can create models with [ecto](http://www.phoenixframework.org/docs/ecto-models) and can start creating controllers and views for our app. Comming soon...
