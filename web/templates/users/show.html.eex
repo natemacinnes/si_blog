@@ -1,0 +1,23 @@
+<h2>Show users</h2>
+
+<ul>
+
+  <li>
+    <strong>Username:</strong>
+    <%= @users.username %>
+  </li>
+
+  <li>
+    <strong>Email:</strong>
+    <%= @users.email %>
+  </li>
+
+  <li>
+    <strong>Password digest:</strong>
+    <%= @users.password_digest %>
+  </li>
+
+</ul>
+
+<%= link "Edit", to: users_path(@conn, :edit, @users) %>
+<%= link "Back", to: users_path(@conn, :index) %>

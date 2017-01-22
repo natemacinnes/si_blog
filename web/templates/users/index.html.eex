@@ -1,0 +1,30 @@
+<h2>Listing users</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Password digest</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for users <- @users do %>
+    <tr>
+      <td><%= users.username %></td>
+      <td><%= users.email %></td>
+      <td><%= users.password_digest %></td>
+
+      <td class="text-right">
+        <%= link "Show", to: users_path(@conn, :show, users), class: "btn btn-default btn-xs" %>
+        <%= link "Edit", to: users_path(@conn, :edit, users), class: "btn btn-default btn-xs" %>
+        <%= link "Delete", to: users_path(@conn, :delete, users), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<%= link "New users", to: users_path(@conn, :new) %>
