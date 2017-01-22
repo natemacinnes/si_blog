@@ -203,7 +203,42 @@ redirect on an update.
 ```
 
 Now our test should be passing again.
+
+We added the appropriate fields for passwords, but we are still missing the
+model behaviour that saves the password hash.
+
+Let's write a test for the behaviour.
+
+```
+  test "password_digest is set to hash" do
+    changeset = Users.changeset(%Users{}, @invalid_attrs)
+    assert get_change(changeset, :password_digest) == "IMAHASH"
+  end
+```
+
+Admitedly not a greate hash, but we will add better hashing later.
+
+Now let's make the test pass. We will add a function `hash_passowrd` to the
+users model.
+
+```
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, [:username, :email, :password, :password_confirmation])
+    |> validate_required([:username, :email, :password,
+:password_confirmation])
+    |> hash_password
+  end
+
+  defp hash_password(changeset) do
+    changeset
+    |> put_change(:password_digest, "IAMAHASH")
+  end
+```
+
+Wooo, finally all the tests pass and we have our, "hashed" password. (I think we
+might have a collision problem).
+** Side not, single quoted things are not strings in elixir! But that is another post.** 
 Now that the test introduction is complete, I will, for the most part leave the
 testing and testing updates up to you.
-
 

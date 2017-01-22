@@ -19,5 +19,11 @@ defmodule SiBlog.Users do
     |> cast(params, [:username, :email, :password, :password_confirmation])
     |> validate_required([:username, :email, :password,
 :password_confirmation])
+    |> hash_password
+  end
+
+  defp hash_password(changeset) do
+    changeset
+    |> put_change(:password_digest, "IMAHASH")
   end
 end

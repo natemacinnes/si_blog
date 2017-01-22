@@ -17,4 +17,9 @@ password_confirmation: "testpass", username:
     changeset = Users.changeset(%Users{}, @invalid_attrs)
     refute changeset.valid?
   end
+
+  test "password_digest is set to hash" do
+    changeset = Users.changeset(%Users{}, @invalid_attrs)
+    assert get_change(changeset, :password_digest) == "IMAHASH"
+  end
 end
