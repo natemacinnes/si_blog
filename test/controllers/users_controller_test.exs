@@ -2,7 +2,9 @@ defmodule SiBlog.UsersControllerTest do
   use SiBlog.ConnCase
 
   alias SiBlog.Users
-  @valid_attrs %{email: "some content", password_digest: "some content", username: "some content"}
+  @valid_create_attrs %{email: "test@example.com", password: "testpass",
+    password_confirmation: "testpass", username: "test_user"}
+  @valid_attrs %{email: "test@example.com", username: "test_user"}
   @invalid_attrs %{}
 
   test "lists all entries on index", %{conn: conn} do
@@ -16,7 +18,7 @@ defmodule SiBlog.UsersControllerTest do
   end
 
   test "creates resource and redirects when data is valid", %{conn: conn} do
-    conn = post conn, users_path(conn, :create), users: @valid_attrs
+    conn = post conn, users_path(conn, :create), users: @valid_create_attrs
     assert redirected_to(conn) == users_path(conn, :index)
     assert Repo.get_by(Users, @valid_attrs)
   end
@@ -46,7 +48,7 @@ defmodule SiBlog.UsersControllerTest do
 
   test "updates chosen resource and redirects when data is valid", %{conn: conn} do
     users = Repo.insert! %Users{}
-    conn = put conn, users_path(conn, :update, users), users: @valid_attrs
+    conn = put conn, users_path(conn, :update, users), users: @valid_create_attrs
     assert redirected_to(conn) == users_path(conn, :show, users)
     assert Repo.get_by(Users, @valid_attrs)
   end

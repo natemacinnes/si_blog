@@ -7,6 +7,8 @@ defmodule SiBlog.Users do
     field :password_digest, :string
 
     timestamps()
+    field :password, :string, virtual: true
+    field :password_confirmation, :string, virtual: true
   end
 
   @doc """
@@ -14,7 +16,8 @@ defmodule SiBlog.Users do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:username, :email, :password_digest])
-    |> validate_required([:username, :email, :password_digest])
+    |> cast(params, [:username, :email, :password, :password_confirmation])
+    |> validate_required([:username, :email, :password,
+:password_confirmation])
   end
 end

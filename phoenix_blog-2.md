@@ -60,5 +60,150 @@ Then,
 $ mix ecto.migrate
 ```
 
+As expected we can go to `127.0.0.1:4000/users`, not much going on there. We
+can't sign in or even create a password, all we have is a password digest field.
+You guessed it, that is what next, creating passwords.
+
+### Creating Password Hashes
+
+When we follow the `/new` action on our users page we have username, email and a
+password digest field. First we are going to remove the line containing, 
+
+```
+<div class=”form-group”>
+  <%= label f, :password_digest, class: “control-label” %>
+  <%= text_input f, :password_digest, class: “form-control” %>
+  <%= error_tag f, :password_digest %>
+</div>
+```
+
+We will now add in two fields, a `:password` and `:password_confirmation` field.
+It should look something like this after,
+```
+<div class="form-group">
+  <%= label f, :password, "Password", class: "control-label" %>
+  <%= password_input f, :password, class: "form-control" %>
+  <%= error_tag f, :password %>
+</div>
+
+<div class="form-group">
+  <%= label f, :password_confirmation, "Password Confirmation", class:
+"control-label" %>
+  <%= password_input f, :password_confirmation, class: "form-control" %>
+  <%= error_tag f, :password_confirmation %>
+</div>
+```
+
+Now we can enter the proper information on the page, but there isn't anything
+creating the password digest in the user table. We still have to create that
+feature.
+
+Sounds like we need to change the User model's behaviour. This is an apportune
+time to play with testing in elixir and phoenix.
+
+### Testing User Behaviour
+
+Head [here](http://www.phoenixframework.org/v0.13.1/docs/introduction) for more information on the test framework.
+
+A quick start, run tests by using command, `mix test` in the root of you phoenix
+project. The first time you run tests it will take a while. (It runs all the
+tests in your project, including those for the included frameworks.) 
+Once complete all things should pass and you can see that there already `Post`
+and `User` controller tests for our project.
+
+Test files can be found in the `test/` directory.
+
+Go ahead and explore: `test/models/posts_test.exs`,
+`test/models/users_test.exs`, `test/controllers/posts_test.exs`, `test/controllers/users_test.exs`
+
+I don't always to test driven devlopment but when I do, I break things first.
+
+We already know we are going to need to add the notion of a password and
+password confirmation to the user model. Let's make our model users fail first.
+
+Inside the `test/models/users_test.exs` lets change the valid attributes for the
+test. Add `password: "testpass", `password_confirmation: "testpass"`
+
+Running `mix test` now will result in our user test failing.
+
+```
+  1)  test changeset with valid attributes (Blog.UsersTest)
+      test/models/user_test.exs:11
+      Expected truthy, got false
+      code: changeset.valid?()
+      stacktrace:
+        test/models/users_test.exs:13: (test)
+```
+
+Now that we broke the test, let's fix it.
+
+Ecto has a cool feature called [virtual
+fields](https://hexdocs.pm/ecto/Ecto.Schema.html). We will add both password and
+password digest to the user schema.
+
+The added fields won't be added to the database, but they will be added to our
+User struct.
+
+Head to `web/models/users.ex` and add these two fields to the user schema
+block.
+
+```
+  field :password, :string, virtual: true
+  field :password_confirmation, :string, virtual: true
+```
+
+And while we are in that file, let's add password and password confirmation as
+validated fields.
+
+```
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, [:username, :email, :password, :password_confirmation])
+    |> validate_required([:username, :email, :password, :password_confirmation])
+  end
+```
+
+With these changes complete, our tests are fixed. Don't trust me? Run `mix test`
+for yourself.
+
+Ahh you got me, in fixing the model we broke our controller.
+Let's head to our controller to fix our test, we want our test to test expected
+behaviour.
+
+We are going to make similar changes to our `test/controllers/users_controller_test.exs`. First lets add the `password:` and  `password_confirmation:` to the valid attributes.
+
+```
+...
+  @valid_create_attrs %{email: "test@example.com", password: "testpass", password_confirmation: "testpass", username: "test_user"}
+  @valid_attrs %{email: "test@example.com", username: "test_user"}
+  @invalid_attrs %{}
+...
+```
+
+Now we will edit our creation test,
+
+```
+  test "creates resource and redirects when data is valid", %{conn: conn} do
+    conn = post conn, users_path(conn, :create), users: @valid_create_attrs
+    assert redirected_to(conn) == users_path(conn, :index)
+    assert Repo.get_by(Users, @valid_attrs)
+  end
+```
+
+That will one of the two broken tests passing, now we still have to fix the
+redirect on an update.
+
+```
+  test "updates chosen resource and redirects when data is valid", %{conn: conn} do
+    users = Repo.insert! %Users{}
+    conn = put conn, users_path(conn, :update, users), users: @valid_create_attrs
+    assert redirected_to(conn) == users_path(conn, :show, users)
+    assert Repo.get_by(Users, @valid_attrs)
+  end
+```
+
+Now our test should be passing again.
+Now that the test introduction is complete, I will, for the most part leave the
+testing and testing updates up to you.
 
 

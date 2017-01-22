@@ -3,7 +3,9 @@ defmodule SiBlog.UsersTest do
 
   alias SiBlog.Users
 
-  @valid_attrs %{email: "some content", password_digest: "some content", username: "some content"}
+  @valid_attrs %{email: "test@example.com", password: "testpass",
+password_confirmation: "testpass", username:
+"test_user"}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
